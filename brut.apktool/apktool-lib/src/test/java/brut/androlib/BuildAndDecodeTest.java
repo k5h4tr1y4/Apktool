@@ -15,6 +15,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.meta.MetaInfo;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.directory.FileDirectory;
@@ -171,15 +172,45 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void xmlReferenceAttributeTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1040.xml");
+    }
+
+    @Test
+    public void xmlCustomAttributeTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1063.xml");
+    }
+
+    @Test
+    public void xmlSmallNumbersDontEscapeTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1130.xml");
+    }
+
+    @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-                + "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
+        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+                + "-xlarge-long-round-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad/strings.xml");
     }
 
     @Test
     public void shortendedMncTest() throws BrutException {
-        compareValuesFiles("values-mcc001-mnc01/strings.xml");
+        compareValuesFiles("values-mcc001-mnc1/strings.xml");
+    }
+
+    @Test
+    public void shortMncHtcTest() throws BrutException {
+        compareValuesFiles("values-mnc1/strings.xml");
+    }
+
+    @Test
+    public void shortMncv2Test() throws BrutException {
+        compareValuesFiles("values-mcc238-mnc6/strings.xml");
+    }
+
+    @Test
+    public void longMncTest() throws BrutException {
+        compareValuesFiles("values-mcc238-mnc870/strings.xml");
     }
 
     @Test
@@ -235,6 +266,12 @@ public class BuildAndDecodeTest {
     @Test
     public void numericalRegionBcp47Test() throws BrutException, IOException {
         compareValuesFiles("values-b+eng+419/strings.xml");
+    }
+
+    @Test
+    public void api23ConfigurationsTest() throws BrutException, IOException {
+        compareValuesFiles("values-round/strings.xml");
+        compareValuesFiles("values-notround/strings.xml");
     }
 
     @Test
@@ -314,13 +351,13 @@ public class BuildAndDecodeTest {
 
     @SuppressWarnings("unchecked")
     private void compareUnknownFiles() throws BrutException, IOException {
-        Map<String, Object> control = new Androlib().readMetaFile(sTestOrigDir);
-        Map<String, Object> test = new Androlib().readMetaFile(sTestNewDir);
-        assertTrue(control.containsKey("unknownFiles"));
-        assertTrue(test.containsKey("unknownFiles"));
+        MetaInfo control = new Androlib().readMetaFile(sTestOrigDir);
+        MetaInfo test = new Androlib().readMetaFile(sTestNewDir);
+        assertNotNull(control.unknownFiles);
+        assertNotNull(test.unknownFiles);
 
-        Map<String, String> control_files = (Map<String, String>)control.get("unknownFiles");
-        Map<String, String> test_files = (Map<String, String>)test.get("unknownFiles");
+        Map<String, String> control_files = control.unknownFiles;
+        Map<String, String> test_files = test.unknownFiles;
         assertTrue(control_files.size() == test_files.size());
 
         // Make sure that the compression methods are still the same
